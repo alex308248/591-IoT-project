@@ -7,6 +7,7 @@ import wiotp.sdk.application
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from csv import writer
 from pydantic import BaseModel
 from mlxtend.frequent_patterns import apriori
 from mlxtend.frequent_patterns import association_rules
@@ -29,19 +30,22 @@ class GroceryDataModel(BaseModel):
 
 client_id = "project"
 type_id = "RaspberryPi"
-MQTT_TOPICS = ["Main","Suggestion"]
+MQTT_TOPICS = ["CustomerId","Suggestion"]
+dataset = "Groceries_dataset_new.csv"
 app = FastAPI()
 app.model = GroceryDataModel()
 app.cost_dict = {}
 app.product_suggestion_dict = {}
 app.bill = 0
-app.member_id = 0
 app.session_data = []
-#df = pd.read_csv('Results_New.csv')
+list_data = []
 
 
+# Init the model
 def init(dataset: str):
     #Create association rule mining model
+    global list_data
+    list_data = []
     app.model.database = pd.read_csv(dataset)
     app.model.basket = pd.read_csv(dataset)#("Groceries_dataset_new.csv")
     app.model.basket.itemDescription = app.model.basket.itemDescription.transform(lambda x: [x])
@@ -63,38 +67,87 @@ def init(dataset: str):
     cost_dict_json = jsonable_encoder(app.cost_dict)
     return JSONResponse(content=cost_dict_json)
 
-def userChannel(evt):
-    payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
-    p_name = payload[1].lstrip(' ')
-    row = df[df['antecedents']==p_name]
-    for index,value in row['consequents'].items():
-        print(f"Index : {index}, Value : {value}")
-        MQTT_publish(MQTT_TOPICS[1], evt.eventId, value)
-        return value
-    
-def globalChannel(evt):
-    payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
-    user_id = payload[1].lstrip(' ')
-    print("Subscribe to", user_id)
-    client.subscribeToDeviceEvents(eventId=user_id)
+# Return the suggestion product and it's cost
+def get_product_cost_suggestion(p_name: str):
+    if p_name in app.product_suggestion_dict:
+        product_inst = Product()
+        product_inst.itemDescription = p_name
+        product_inst.itemCost = app.cost_dict[p_name]
+        product_inst.productSuggestion = app.product_suggestion_dict[p_name]
+        #product_inst_json = jsonable_encoder(product_inst)
+        return product_inst.productSuggestion, product_inst.itemCost
+    else:
+        raise HTTPException(status_code=404, detail="Product not found")
 
+# Return the cost of the product
+def get_product_cost(p_name: str):
+    if p_name in app.cost_dict:
+        product_inst = Product()
+        product_inst.itemDescription = p_name
+        product_inst.itemCost = app.cost_dict[p_name]
+        #product_inst_json = jsonable_encoder(product_inst)
+        return product_inst.itemCost
+    else:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+# The main callback function of subscribing
 def CallBack(evt):
     print(evt.eventId)
     if evt.eventId == MQTT_TOPICS[0]:
         globalChannel(evt)
     else: 
         userChannel(evt)
+
+# When the message is from  a user channel, put the payload in model and get a suggestion back
+def userChannel(evt):
+    global list_data
+    payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
+    p_name = payload[1].lstrip(' ')
+    if p_name == 'Reset':
+        update_database()
+    else:
+        suggestion, suggestion_cost = get_product_cost_suggestion(p_name)
+        product_cost = get_product_cost(p_name)
+        print(f"Product : {p_name}, Suggestion : {suggestion}")
+        list_data.append([evt.eventId, p_name, product_cost])
+        MQTT_publish(MQTT_TOPICS[1], evt.eventId, suggestion)
+        return suggestion
     
+# When the message is from the global channel, subscribe to the user(which will be the payload of message) 
+def globalChannel(evt):
+    payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
+    user_id = payload[1].lstrip(' ')
+    print("Subscribe to", user_id)
+    client.subscribeToDeviceEvents(eventId=user_id)
+    init(dataset)
+
+# The onPublish function in MQTT_publish
 def printing(topic, key, payload):
     print(f"Send to topic `{topic}` => {key}: {payload}")
 
+# Publish the message by MQTT
+# event_id: topic of the message
+# key : the first part
+# value : the second part
 def MQTT_publish(event_id, key, value):
     eventData = {key : value}
     client.publishEvent(typeId=type_id, deviceId=client_id, eventId=event_id, msgFormat="json", data=eventData, qos = 2, onPublish=printing(topic = MQTT_TOPICS[1], key = key, payload = value))
 
+# Update the database after the user checkout
+def update_database():
+    timestr = time.strftime("%Y%m%d_%H%M%S")
+    filename = "Grocery_data_" + timestr + ".csv"
+    app.model.database = app.model.database.append(pd.DataFrame(app.session_data,columns = ['Member_number','itemDescription','itemCost']))
+    msg = "Updated dataset " + filename + " at time " + timestr
+    print(msg)
 
-
-
+    with open(dataset, 'a', newline='') as f_object:  
+        writer_object = writer(f_object)
+        for data in list_data:
+            writer_object.writerow(data)  
+        f_object.close()
+    return msg
+    
 print('1')
 options = wiotp.sdk.application.parseConfigFile("application.yaml")
 print('2')
@@ -111,6 +164,6 @@ print('6')
 if __name__ == '__main__':
     try:
         while True:
-            time.sleep(5)
+            time.sleep(1)
     except Exception as e:
         print("Exception: ", e)
