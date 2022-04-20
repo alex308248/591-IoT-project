@@ -28,9 +28,10 @@ class GroceryDataModel(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
+USER = ""
 client_id = "project"
 type_id = "RaspberryPi"
-MQTT_TOPICS = ["CustomerId","Suggestion"]
+MQTT_TOPICS = ["CustomerId"]
 dataset = "Groceries_dataset_new.csv"
 app = FastAPI()
 app.model = GroceryDataModel()
@@ -103,22 +104,25 @@ def userChannel(evt):
     global list_data
     payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
     p_name = payload[1].lstrip(' ')
-    if p_name == 'Reset':
+    if evt.eventId == USER+"/reset":
         update_database()
     else:
         suggestion, suggestion_cost = get_product_cost_suggestion(p_name)
         product_cost = get_product_cost(p_name)
         print(f"Product : {p_name}, Suggestion : {suggestion}")
         list_data.append([evt.eventId, p_name, product_cost])
-        MQTT_publish(MQTT_TOPICS[1], evt.eventId, suggestion)
+        MQTT_publish(evt.eventId+"/suggestion", evt.eventId, suggestion)
         return suggestion
     
 # When the message is from the global channel, subscribe to the user(which will be the payload of message) 
 def globalChannel(evt):
+    global USER
     payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
     user_id = payload[1].lstrip(' ')
+    client.subscribeToDeviceEvents(eventId=user_id+"/scanned_item")
+    client.subscribeToDeviceEvents(eventId=user_id+"/reset")
+    USER = user_id
     print("Subscribe to", user_id)
-    client.subscribeToDeviceEvents(eventId=user_id)
     init(dataset)
 
 # The onPublish function in MQTT_publish
