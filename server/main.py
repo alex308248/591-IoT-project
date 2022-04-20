@@ -93,7 +93,6 @@ def get_product_cost(p_name: str):
 
 # The main callback function of subscribing
 def CallBack(evt):
-    print(evt.eventId)
     if evt.eventId == MQTT_TOPICS[0]:
         globalChannel(evt)
     else: 
@@ -103,15 +102,15 @@ def CallBack(evt):
 def userChannel(evt):
     global list_data
     payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
-    p_name = payload[1].lstrip(' ')
-    if evt.eventId == USER+"/reset":
+    p_name = payload[2].lstrip(' ')
+    if evt.eventId == USER+":reset":
         update_database()
     else:
         suggestion, suggestion_cost = get_product_cost_suggestion(p_name)
         product_cost = get_product_cost(p_name)
         print(f"Product : {p_name}, Suggestion : {suggestion}")
         list_data.append([evt.eventId, p_name, product_cost])
-        MQTT_publish(evt.eventId+"/suggestion", evt.eventId, suggestion)
+        MQTT_publish(USER+":suggestion", USER, suggestion)
         return suggestion
     
 # When the message is from the global channel, subscribe to the user(which will be the payload of message) 
@@ -119,8 +118,8 @@ def globalChannel(evt):
     global USER
     payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
     user_id = payload[1].lstrip(' ')
-    client.subscribeToDeviceEvents(eventId=user_id+"/scanned_item")
-    client.subscribeToDeviceEvents(eventId=user_id+"/reset")
+    client.subscribeToDeviceEvents(eventId=user_id+":scanned_item")
+    client.subscribeToDeviceEvents(eventId=user_id+":reset")
     USER = user_id
     print("Subscribe to", user_id)
     init(dataset)
@@ -135,7 +134,7 @@ def printing(topic, key, payload):
 # value : the second part
 def MQTT_publish(event_id, key, value):
     eventData = {key : value}
-    client.publishEvent(typeId=type_id, deviceId=client_id, eventId=event_id, msgFormat="json", data=eventData, qos = 2, onPublish=printing(topic = MQTT_TOPICS[1], key = key, payload = value))
+    client.publishEvent(typeId=type_id, deviceId=client_id, eventId=event_id, msgFormat="json", data=eventData, qos = 2, onPublish=printing(topic = event_id, key = key, payload = value))
 
 # Update the database after the user checkout
 def update_database():
