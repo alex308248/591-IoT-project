@@ -90,9 +90,10 @@ while True:
     if payload in customersList:
         if foundCustomer == False:
             customerId = payload
-            ibm_cloud.subscribe(client=client, topic=customerId)
+            #ibm_cloud.subscribe(client=client, topic=customerId)
+            ibm_cloud.subscribe(client=client, topic=customerId + ":" + "reset")
             ibm_cloud.publish(client=client, topic=topic, payload=payload)
-            topic = payload
+            topic = payload + ":" + "scanned_item"
             foundCustomer = True
     elif payload in productList:
         if foundCustomer == True:
@@ -102,6 +103,8 @@ while True:
             print("Please scan your VIP card")
     #reset condition
     if payload == "41_217_238_60" and foundCustomer == True:
+        topic = customerId + ":" + "reset"
         ibm_cloud.publish(client=client, topic=topic, payload=payload)
+        #ibm_cloud.publish(client=client, topic=topic, payload=payload)
     time.sleep(5)
     
