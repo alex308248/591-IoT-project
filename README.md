@@ -11,6 +11,8 @@ We will need a Raspberry Pi with RFID sensor, and two laptops to run the project
 2. Server: It will receive the user messages from Raspberry Pi and subscribe to the {user} channel. Server will also analyze the product and publish the suggestion to the webapp. Server will also update the database when it receives the reset message from webapp.
 3. WebApp: Webapp will render a webpage for user and showing the scanned product and current suggestion. When the customer clicks the `checkout` bottom on the webpage, it will publish a reset message to Server and Raspberry Pi. 
 
+![image](https://github.com/alex308248/591-IoT-project/blob/main/systemdiagram.png)
+
 ## Environment settings
 Raspberry Pi Setup
 ```sh
