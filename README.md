@@ -20,6 +20,7 @@ We will need a Raspberry Pi with RFID sensor, and two laptops to run the project
 4. Scan a product tag, and it should shows the name of the product at the `scanned item` part, shows the suggsestion at the `suggestion product` part, and shows the cost at the `Total$`.
 5. Excute the previous action with different product tag, it should update the suggestion product and cost.
 6. Press the `Check out` bottom, which it will update the database and allow to scan a new customer Tag.
+7. You should see the updated data in the `server/Groceries_dataset_new.csv` file.
 
 ## Environment settings
 Raspberry Pi Setup
