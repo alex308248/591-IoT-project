@@ -10,26 +10,41 @@ There are several assumption in our project. First of all, we assume each custom
 ## Environment settings
 Raspberry Pi Setup
 ```sh
+pip install wiot-sdk
+pip install board
+pip install busio
+pip install digitalio
+pip install adafruit_pn532.i2c
 ```
 
 Sever Setup
 ```sh
+pip install -r requirement.txt
 ```
 
 WebApp Setup
 ```sh
+pip install wiotp-sdk
+pip install flask
+pip install flask-socketio
 ```
 
 ## How to run the code
 Raspberry Pi
 ```sh
+cd raspberrypi
+python ShoppingCart.py
 ```
 
 Sever
 ```sh
+cd server
+python main.py
 ```
 
 WebApp
 ```sh
+cd webapp
+python main.py
 ```
 
