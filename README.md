@@ -13,6 +13,14 @@ We will need a Raspberry Pi with RFID sensor, and two laptops to run the project
 
 ![image](https://github.com/alex308248/591-IoT-project/blob/main/systemdiagram.png)
 
+## Demo Steps
+1. Run the three files on three different device and make sure each of them have connected to IBM Cloud.
+2. Open the web page.
+3. Scan a customer RFID tag, and it should shows the name of customer at the top of the web page. 
+4. Scan a product tag, and it should shows the name of the product at the `scanned item` part, shows the suggsestion at the `suggestion product` part, and shows the cost at the `Total$`.
+5. Excute the previous action with different product tag, it should update the suggestion product and cost.
+6. Press the `Check out` bottom, which it will update the database and allow to scan a new customer Tag.
+
 ## Environment settings
 Raspberry Pi Setup
 ```sh
