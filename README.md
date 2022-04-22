@@ -6,6 +6,10 @@ The project work is targeted at giving students opportunity to obtain better kno
 There are several assumption in our project. First of all, we assume each customer have a FRID tag which represent their identity. Second, we assume each product will have a RFID tag on it self. Third, we assume all of the customer were already login in our webapp and ready for checkout.
 
 ## System Design
+We will need a Raspberry Pi with RFID sensor, and two laptop for running the project.
+1. Raspberry Pi: It will represent the checkout counter and send the user login message through `CustomerId` channel. After that, the scanned products will be publish to the {user} channel.
+2. Server: It will recevie the user messages from Raspberry Pi and subscribe to the {user} channel. Server will also analyze the product and publish the suggestion to the webapp. Server will also update the database when it receive the reset message from webapp.
+3. WebApp: Webapp will render a webpage for user and showing the scanned product and current suggesiton. When the customer click the `checkout` buttom on the webpage, it will publish a reset message to Server and Raspberry Pi. 
 
 ## Environment settings
 Raspberry Pi Setup
@@ -17,7 +21,7 @@ pip install digitalio
 pip install adafruit_pn532.i2c
 ```
 
-Sever Setup
+Server Setup
 ```sh
 pip install -r requirement.txt
 ```
@@ -36,7 +40,7 @@ cd raspberrypi
 python ShoppingCart.py
 ```
 
-Sever
+Server
 ```sh
 cd server
 python main.py
