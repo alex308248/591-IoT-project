@@ -1,4 +1,3 @@
-from pydoc_data.topics import topics
 import time
 import json
 import pandas as pd
@@ -101,16 +100,16 @@ def CallBack(evt):
 # When the message is from  a user channel, put the payload in model and get a suggestion back
 def userChannel(evt):
     global list_data
-    payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
-    p_name = payload[2].lstrip(' ')
     if evt.eventId == USER+":reset":
         update_database()
     else:
+        payload = json.dumps(evt.data).strip("{\" }").replace('"','').split(":")
+        p_name = payload[2].lstrip(' ')
         suggestion, suggestion_cost = get_product_cost_suggestion(p_name)
         product_cost = get_product_cost(p_name)
         print(f"Product : {p_name}, Suggestion : {suggestion}")
         list_data.append([evt.eventId, p_name, product_cost])
-        MQTT_publish(USER+":suggestion", USER, suggestion)
+        MQTT_publish(USER+":suggestion", USER+":suggestion", suggestion)
         return suggestion
     
 # When the message is from the global channel, subscribe to the user(which will be the payload of message) 
