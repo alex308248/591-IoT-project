@@ -44,13 +44,20 @@ def eventPublishCallback(topic, payload):
 def myEventCallback(event):
     global resetFlag
     #str = "%s event '%s' received from device [%s]: %s"
+    print(event.eventId)
     #print(str % (event.format, event.eventId, event.device, json.dumps(event.data)))
     #print(event.data)
     #print(event.data[event.eventId])
     #reset condition
-    if "41_217_238_60" == event.data[event.eventId]:
+    
+    if "reset" in event.eventId:
         print("reset")
         resetFlag = True
+        
+    elif "41_217_238_60" == event.data[event.eventId]:
+        print("reset")
+        resetFlag = True
+    
 
 
 def subscribe(client, topic):
