@@ -44,7 +44,7 @@ $ pip3 install flask-socketio
 $ pip3 install python-dotenv
 $ pip3 install wiotp-sdk
 ```
-Create `.env` file in the current directory. Input following into `.env` file.
+Create `.env` file in the webapp directory. Input following into `.env` file.
 ```
 HOST=<IPv4 address>
 ```
