@@ -7,9 +7,9 @@ There are several assumptions in our project. First of all, we assume each custo
 
 ## System Design
 We will need a Raspberry Pi with RFID sensor, and two laptops to run the project.
-1. Raspberry Pi: It will represent the checkout counter and send the user login message through `CustomerId` channel. After that, the scanned products name will be published to the {user} channel.
-2. Server: It will receive the user messages from Raspberry Pi and subscribe to the {user} channel. Server will also analyze the product and publish the suggestion to the webapp. Server will also update the database when it receives the reset message from webapp.
-3. WebApp: Webapp will render a webpage for user and showing the scanned product and current suggestion. When the customer clicks the `checkout` bottom on the webpage, it will publish a reset message to Server and Raspberry Pi. 
+1. Raspberry Pi: It will represent the checkout counter and send the user login message through `CustomerId` channel. After that, the scanned products name will be published to the {user} channel. When the raspberry pi receives the {customerName}reset message under the topic {customerName:reset}, it will change the variables back to default and wait for the next customer to scan his/her membership card.
+2. Server: It will receive the user messages from Raspberry Pi and subscribe to the {user} channel. The server will use the data from the previous transaction to update the model. Then analyze the product and publish the suggestion to the webapp. Server will also update the database when it receives the reset message from webapp.
+3. WebApp: Webapp will render a webpage for user and show the scanned product received from the raspberry pi, followed by the recommended product received from the server and calculate the total amount of the bill. When the customer clicks the `checkout` button on the webpage, it will publish a reset message to Server and Raspberry Pi.
 
 ![image](https://github.com/alex308248/591-IoT-project/blob/main/systemdiagram.png)
 

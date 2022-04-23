@@ -23,7 +23,7 @@ from adafruit_pn532.i2c import PN532_I2C
 # from adafruit_pn532.uart import PN532_UART
 
 customersList = {"1_35_69_103"}
-customerName = {"1_35_69_103": "Andy"}
+customerName = {"1_35_69_103": "Andy","44_152_238_60": "Sam"}
 productList = {"30_199_238_60":"butter milk", "22_199_238_60":"coffee", "50_159_238_60":"candy", "233_216_238_60":"cereals", "137_160_238_60":"ham"}
 
 
