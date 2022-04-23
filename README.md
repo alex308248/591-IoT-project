@@ -23,7 +23,7 @@ We will need a Raspberry Pi with RFID sensor, and two laptops to run the project
 7. You should see the updated data in the `server/Groceries_dataset_new.csv` file.
 
 ## Environment settings
-Raspberry Pi Setup
+######Raspberry Pi Setup
 ```sh
 $ pip install wiot-sdk
 $ pip install board
@@ -32,12 +32,12 @@ $ pip install digitalio
 $ pip install adafruit_pn532.i2c
 ```
 
-Server Setup
+######Server Setup
 ```sh
 $ pip install -r requirement.txt
 ```
 
-WebApp Setup
+######WebApp Setup
 ```sh
 $ pip3 install Flask
 $ pip3 install flask-socketio
@@ -50,19 +50,20 @@ HOST=<IPv4 address>
 ```
 
 ## How to run the code
-Raspberry Pi
+
+######Raspberry Pi
 ```sh
 $ cd raspberrypi
 $ python ShoppingCart.py
 ```
 
-Server
+######Server
 ```sh
 $ cd server
 $ python main.py
 ```
 
-WebApp
+######WebApp
 ```sh
 $ cd webapp
 $ python main.py
