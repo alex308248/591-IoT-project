@@ -25,41 +25,46 @@ We will need a Raspberry Pi with RFID sensor, and two laptops to run the project
 ## Environment settings
 Raspberry Pi Setup
 ```sh
-pip install wiot-sdk
-pip install board
-pip install busio
-pip install digitalio
-pip install adafruit_pn532.i2c
+$ pip install wiot-sdk
+$ pip install board
+$ pip install busio
+$ pip install digitalio
+$ pip install adafruit_pn532.i2c
 ```
 
 Server Setup
 ```sh
-pip install -r requirement.txt
+$ pip install -r requirement.txt
 ```
 
 WebApp Setup
 ```sh
-pip install wiotp-sdk
-pip install flask
-pip install flask-socketio
+$ pip3 install Flask
+$ pip3 install flask-socketio
+$ pip3 install python-dotenv
+$ pip3 install wiotp-sdk
+```
+Create `.env` file in the current directory. Input following into `.env` file.
+```
+HOST=<IPv4 address>
 ```
 
 ## How to run the code
 Raspberry Pi
 ```sh
-cd raspberrypi
-python ShoppingCart.py
+$ cd raspberrypi
+$ python ShoppingCart.py
 ```
 
 Server
 ```sh
-cd server
-python main.py
+$ cd server
+$ python main.py
 ```
 
 WebApp
 ```sh
-cd webapp
-python main.py
+$ cd webapp
+$ python main.py
 ```
 
